@@ -10,13 +10,8 @@ class _HomePageState extends State<HomePage> {
   SuperHeroesLogic superHeroesLogic = SuperHeroesLogic();
   int correct = 0;
   int incorrect = 0;
-  void checkAnswer(String name){
-    String correctName = superHeroesLogic.getAnswer();
-    if (correctName == name){
-      correct++;
-    }else{
-      incorrect++;
-    }
+  List<Widget> score = [];
+  void checkAnswer(String name){    
     if (superHeroesLogic.isFinishedFunc()){
       showDialog(
         context: context,
@@ -41,6 +36,7 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () {
                   superHeroesLogic.restartQuiz();
                   Navigator.pop(context);
+                  score.clear();
                   correct = 0;
                   incorrect = 0;
                   setState(() {});
@@ -53,10 +49,29 @@ class _HomePageState extends State<HomePage> {
       );
       return;
     }
+    String correctName = superHeroesLogic.getAnswer();
+    if (correctName == name){
+      score.add(itemScore((superHeroesLogic.superIndex + 1).toString(), true));
+      correct++;
+    }else{
+      score.add(itemScore((superHeroesLogic.superIndex + 1).toString(), false));
+      incorrect++;
+    }
     superHeroesLogic.nextQuestion();
     setState(() {});
   }
 
+  Widget itemScore(String numberQuestion, bool isCorrect) {
+    return Row(
+      children: [
+        Text("$numberQuestion:", style: TextStyle(color: Colors.white)),
+        Icon(
+          isCorrect ? Icons.check : Icons.close,
+          color: isCorrect ? Colors.greenAccent : Colors.redAccent,
+        ),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +147,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ],
                 ),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: score),
             ],
             ),
           ],
